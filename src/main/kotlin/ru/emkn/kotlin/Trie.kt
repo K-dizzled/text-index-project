@@ -17,35 +17,21 @@ class Trie<Key> {
         current.isTerminating = true
     }
 
-    fun contains(list: List<Key>): Boolean {
-        var current = root
-
-        list.forEach { element ->
-            val child = current.children[element] ?: return false
-            current = child
-        }
-
-        return current.isTerminating
-    }
-
-    private fun collections(prefix: List<Key>, node: TrieNode<Key>?): List<List<Key>> {
-        // 1
+    private fun listForms(prefix: List<Key>, node: TrieNode<Key>?): List<List<Key>> {
         val results = mutableListOf<List<Key>>()
 
         if (node?.isTerminating == true) {
             results.add(prefix)
         }
 
-        // 2
         node?.children?.forEach { (key, node) ->
-            results.addAll(collections(prefix + key, node))
+            results.addAll(listForms(prefix + key, node))
         }
 
         return results
     }
 
-    fun collections(prefix: List<Key>): List<List<Key>> {
-        // 1
+    fun listForms(prefix: List<Key>): List<List<Key>> {
         var current = root
 
         prefix.forEach { element ->
@@ -53,7 +39,6 @@ class Trie<Key> {
             current = child
         }
 
-        // 2
-        return collections(prefix, current)
+        return listForms(prefix, current)
     }
 }

@@ -5,12 +5,8 @@ fun main(args: Array<String>) {
         insert(string.toList())
     }
 
-    fun Trie<Char>.contains(string: String): Boolean {
-        return contains(string.toList())
-    }
-
     fun Trie<Char>.collections(prefix: String): List<String> {
-        return collections(prefix.toList()).map { it.joinToString(separator = "") }
+        return listForms(prefix.toList()).map { it.joinToString(separator = "") }
     }
 
 
@@ -31,7 +27,7 @@ fun main(args: Array<String>) {
 
 }
 
-class TrieNode<Key>(var key: Key?, var parent: TrieNode<Key>?) {
+data class TrieNode<Key>(var key: Key?, var parent: TrieNode<Key>?) {
     val children: HashMap<Key, TrieNode<Key>> = HashMap()
     var isTerminating = false
 }
