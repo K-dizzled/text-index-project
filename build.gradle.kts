@@ -21,6 +21,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation(kotlin("test"))
+    implementation("com.github.ajalt.clikt:clikt:3.0.1")
+    //gradle kotlin DSL
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3")
 }
 
 tasks.withType(KotlinCompile::class.java) {
@@ -33,6 +36,12 @@ tasks.test {
     useJUnitPlatform()
     testLogging {
         events("passed", "skipped", "failed")
+    }
+}
+
+tasks.register("hello") {
+    doLast {
+        println("Hello, World!")
     }
 }
 
@@ -54,6 +63,3 @@ val runJar by tasks.creating(Exec::class) {
     commandLine(*evalArgs.toTypedArray())
 }
 
-//tasks.compileJava {
-//    dependsOn(tasks.jar)
-//}
