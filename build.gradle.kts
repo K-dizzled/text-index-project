@@ -24,6 +24,7 @@ dependencies {
     implementation("com.github.ajalt.clikt:clikt:3.0.1")
     //gradle kotlin DSL
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3")
+    implementation("org.apache.commons:commons-csv:1.5")
 }
 
 tasks.withType(KotlinCompile::class.java) {
