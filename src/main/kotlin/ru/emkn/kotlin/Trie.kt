@@ -20,7 +20,7 @@ class Trie<Key> {
         val results = mutableListOf<List<Key>>()
 
         if (node?.isTerminating == true) {
-            if (node.wordIndex == wordIndex)
+            //if (node.wordIndex == wordIndex)
                 results.add(prefix)
         }
 

@@ -11,8 +11,8 @@ fun main(args: Array<String>) {
 
     val trie = parseCSV()
 
-    println("\nCollections starting with \"car\"")
-    val prefixedWithCar = trie.collections("car", 1)
+    println("\nСловоформы слова \"коряга\"")
+    val prefixedWithCar = trie.collections("кор", 1)
     println(prefixedWithCar)
 
 }
