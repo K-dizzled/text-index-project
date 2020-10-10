@@ -4,34 +4,34 @@ class Trie<Key> {
 
     private val root = TrieNode<Key>(key = null, parent = null)
 
-    fun insert(list: List<Key>) {
+    fun insert(list: List<Key>, wordIndex: Int) {
         var current = root
-
         list.forEach { element ->
             if (current.children[element] == null) {
                 current.children[element] = TrieNode(element, current)
             }
             current = current.children[element]!!
         }
-
+        current.wordIndex = wordIndex
         current.isTerminating = true
     }
 
-    private fun listForms(prefix: List<Key>, node: TrieNode<Key>?): List<List<Key>> {
+    private fun listForms(prefix: List<Key>, node: TrieNode<Key>?, wordIndex: Int): List<List<Key>> {
         val results = mutableListOf<List<Key>>()
 
         if (node?.isTerminating == true) {
-            results.add(prefix)
+            if (node.wordIndex == wordIndex)
+                results.add(prefix)
         }
 
         node?.children?.forEach { (key, node) ->
-            results.addAll(listForms(prefix + key, node))
+            results.addAll(listForms(prefix + key, node, wordIndex))
         }
 
         return results
     }
 
-    fun listForms(prefix: List<Key>): List<List<Key>> {
+    fun listForms(prefix: List<Key>, wordIndex: Int): List<List<Key>> {
         var current = root
 
         prefix.forEach { element ->
@@ -39,6 +39,6 @@ class Trie<Key> {
             current = child
         }
 
-        return listForms(prefix, current)
+        return listForms(prefix, current, wordIndex)
     }
 }
