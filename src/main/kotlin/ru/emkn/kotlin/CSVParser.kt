@@ -15,7 +15,7 @@ fun parseCSV(): Trie<Char> {
 
     val dictionary = Trie<Char>()
     Files.newBufferedReader(Paths.get(csvFilePath)).use { reader ->
-        CSVParser(reader, CSVFormat.DEFAULT).use { csvParser ->
+        CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader()).use { csvParser ->
             for (csvRecord in csvParser) {
                 // Accessing Values by Column Index
                 csvRecord.forEach {

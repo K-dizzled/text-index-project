@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
     val trie = parseCSV()
 
     println("\nCollections starting with \"car\"")
-    val prefixedWithCar = trie.collections("car", 3)
+    val prefixedWithCar = trie.collections("car", 1)
     println(prefixedWithCar)
 
 }
