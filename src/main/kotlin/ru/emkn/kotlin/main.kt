@@ -1,19 +1,17 @@
 package ru.emkn.kotlin
 
 fun main(args: Array<String>) {
-    fun Trie<Char>.insert(string: String, wordIndex: Long) {
-        insert(string.toList(), wordIndex)
+    fun Trie<Char>.findIndex(string: String): Long {
+        return findIndex(string.toList())
     }
 
-    fun Trie<Char>.collections(prefix: String, wordIndex: Long): List<String> {
-        return listForms(prefix.toList(), wordIndex).map { it.joinToString(separator = "") }
+    fun Trie<Char>.listForms(prefix: String, wordIndex: Long): List<String> {
+        return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex).map { it.joinToString(separator = "") }
     }
 
     val trie = parseCSV()
 
     println("\nСловоформы слова \"коряга\"")
-    val prefixedWithCar = trie.collections("кор", 1)
-    println(prefixedWithCar)
-
+    println(trie.listForms("коряга", trie.findIndex("коряга")))
 }
 

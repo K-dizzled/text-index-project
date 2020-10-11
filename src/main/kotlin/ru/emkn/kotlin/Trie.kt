@@ -16,11 +16,21 @@ class Trie<Key> {
         current.isTerminating = true
     }
 
+    fun findIndex(list: List<Key>): Long {
+        var current = root
+
+        list.forEach { element ->
+            val child = current.children[element] ?: return -1
+            current = child
+        }
+        return if (current.isTerminating) current.wordIndex else -1
+    }
+
     private fun listForms(prefix: List<Key>, node: TrieNode<Key>?, wordIndex: Long): List<List<Key>> {
         val results = mutableListOf<List<Key>>()
 
         if (node?.isTerminating == true) {
-            //if (node.wordIndex == wordIndex)
+            if (node.wordIndex == wordIndex)
                 results.add(prefix)
         }
 
