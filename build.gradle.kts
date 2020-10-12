@@ -11,6 +11,9 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://kotlin.bintray.com/kotlinx")
+    }
 }
 
 dependencies {
@@ -25,6 +28,7 @@ dependencies {
     //gradle kotlin DSL
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3")
     implementation("org.apache.commons:commons-csv:1.5")
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3")
 }
 
 tasks.withType(KotlinCompile::class.java) {

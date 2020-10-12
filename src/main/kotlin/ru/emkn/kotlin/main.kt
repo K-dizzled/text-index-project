@@ -1,10 +1,18 @@
 package ru.emkn.kotlin
 
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.*
+import kotlinx.cli.*
 import java.io.File
 import kotlin.collections.HashSet
 
 fun main(args: Array<String>) {
-    val wordToBeFound = "ужин".toLowerCase()
+    val parser = ArgParser("example")
+    val wordToBeFound by parser.option(ArgType.String, shortName = "w", description = "Input word").required()
+    val taskNumber by parser.option(ArgType.Int, shortName = "t", description = "Task number").required()
+    parser.parse(args)
+
+    //val wordToBeFound = "ужин".toLowerCase()
 
     //Functions to simplify Trie methods calls
     fun Trie<Char>.findIndex(string: String): Long {
@@ -146,4 +154,11 @@ fun findWordsFromCategory(category: String, dict: Trie<Char>, fileName: String =
         }
     }
     return wordsFromCategory
+}
+
+class Hello: CliktCommand() {
+    val name by option("-n", "--name", help="your name")
+    override fun run() {
+        echo("Hello, $name!")
+    }
 }

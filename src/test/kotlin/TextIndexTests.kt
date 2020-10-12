@@ -16,21 +16,21 @@ class TextIndexTests {
 //        assertEquals(5, main(4))
     }
 
-    @Test
-    fun `illegal argument test`() {
-        assertFailsWith(IllegalArgumentException::class) {
-            //main(-2)
-        }
-    }
-
-    @Test
-    fun `timeout test`() {
-        val res = assertTimeoutPreemptively(Duration.ofSeconds(5)) {
-            //main()
-            //main(50)
-        }
-        assertEquals(20365011074L, res)
-    }
+//    @Test
+//    fun `illegal argument test`() {
+//        assertFailsWith(IllegalArgumentException::class) {
+//            //main(-2)
+//        }
+//    }
+//
+//    @Test
+//    fun `timeout test`() {
+//        val res = assertTimeoutPreemptively(Duration.ofSeconds(5)) {
+//            //main()
+//            //main(50)
+//        }
+//        assertEquals(20365011074L, res)
+//    }
 
     @TestFactory
     fun `multiple test`(): Stream<DynamicTest> {
