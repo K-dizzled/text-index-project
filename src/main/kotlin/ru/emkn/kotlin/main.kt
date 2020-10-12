@@ -8,42 +8,49 @@ import kotlin.collections.HashSet
 
 fun main(args: Array<String>) {
     val parser = ArgParser("example")
-    val wordToBeFound by parser.option(ArgType.String, shortName = "w", description = "Input word").required()
+    val wordToBeFound by parser.option(ArgType.String, shortName = "w", description = "Input word")
     val taskNumber by parser.option(ArgType.Int, shortName = "t", description = "Task number").required()
+    val category by parser.option(ArgType.String, shortName = "c", description = "Category name")
+    val inputFile by parser.option(ArgType.String, shortName = "i", description = "Input file path")
+
     parser.parse(args)
+    if(taskNumber == 1)
+        Task1(wordToBeFound.toString())
 
-    //val wordToBeFound = "ужин".toLowerCase()
 
-    //Functions to simplify Trie methods calls
-    fun Trie<Char>.findIndex(string: String): Long {
-        return findIndex(string.toList())
-    }
 
-    fun Trie<Char>.listForms(prefix: String, wordIndex: Long): List<String> {
-        return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex)
-            .map { it.joinToString(separator = "") }
-    }
-
-    //Create a Trie object, where we store a dictionary of word forms
-    val dict = parseCSV()
-
-    //List the numbers of pages, where the word or it's forms where used
-    val answer1= findWordInText(dict.listForms(wordToBeFound,
-        dict.findIndex(wordToBeFound)).toList())
-    println("Страницы, на которых найдены формы слова \"$wordToBeFound\": ${answer1.first.joinToString()}")
-    //Forms of the word, that were used in the text
-    println("Формы, в которых встречается слово \"$wordToBeFound\": ${answer1.second.joinToString()}")
-    //Amount of times the word or it's forms were used
-    println("Количество раз, когда встретилось слово \"$wordToBeFound\": ${answer1.third}")
-    //Prints all lines, where the word or it's forms were used
-    findWordInText(dict.listForms(wordToBeFound, dict.findIndex(wordToBeFound)), task = 2)
-    //Print 5 most used words from the text
-    printMostUsedWords(dict)
-    //Print all words and it's forms contained in some category
-    val category = "прилагательные"
-    println("Формы, в которых встречаются слова из категории \"$category\": " +
-            findWordsFromCategory(category, dict).joinToString()
-    )
+//    //val wordToBeFound = "ужин".toLowerCase()
+//
+//    //Functions to simplify Trie methods calls
+//    fun Trie<Char>.findIndex(string: String): Long {
+//        return findIndex(string.toList())
+//    }
+//
+//    fun Trie<Char>.listForms(prefix: String, wordIndex: Long): List<String> {
+//        return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex)
+//            .map { it.joinToString(separator = "") }
+//    }
+//
+//    //Create a Trie object, where we store a dictionary of word forms
+//    val dict = parseCSV()
+//
+//    //List the numbers of pages, where the word or it's forms where used
+//    val answer1= findWordInText(dict.listForms(wordToBeFound,
+//        dict.findIndex(wordToBeFound)).toList())
+//    println("Страницы, на которых найдены формы слова \"$wordToBeFound\": ${answer1.first.joinToString()}")
+//    //Forms of the word, that were used in the text
+//    println("Формы, в которых встречается слово \"$wordToBeFound\": ${answer1.second.joinToString()}")
+//    //Amount of times the word or it's forms were used
+//    println("Количество раз, когда встретилось слово \"$wordToBeFound\": ${answer1.third}")
+//    //Prints all lines, where the word or it's forms were used
+//    findWordInText(dict.listForms(wordToBeFound, dict.findIndex(wordToBeFound)), task = 2)
+//    //Print 5 most used words from the text
+//    printMostUsedWords(dict)
+//    //Print all words and it's forms contained in some category
+//    //val category = "прилагательные"
+//    println("Формы, в которых встречаются слова из категории \"$category\": " +
+//            findWordsFromCategory(category, dict).joinToString()
+//    )
 }
 
 fun findWordInText(wordForms: List<String>, fileName: String = "./data/Childhood.txt", task: Int = 1)
@@ -156,9 +163,72 @@ fun findWordsFromCategory(category: String, dict: Trie<Char>, fileName: String =
     return wordsFromCategory
 }
 
-class Hello: CliktCommand() {
-    val name by option("-n", "--name", help="your name")
-    override fun run() {
-        echo("Hello, $name!")
+fun Task1(wordToBeFound: String) {
+    //Functions to simplify Trie methods calls
+    fun Trie<Char>.findIndex(string: String): Long {
+        return findIndex(string.toList())
     }
+
+    fun Trie<Char>.listForms(prefix: String, wordIndex: Long): List<String> {
+        return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex)
+            .map { it.joinToString(separator = "") }
+    }
+
+    //Create a Trie object, where we store a dictionary of word forms
+    val dict = parseCSV()
+
+    //List the numbers of pages, where the word or it's forms where used
+    val answer1= findWordInText(dict.listForms(wordToBeFound,
+        dict.findIndex(wordToBeFound)).toList())
+    println("Страницы, на которых найдены формы слова \"$wordToBeFound\": ${answer1.first.joinToString()}")
+    //Forms of the word, that were used in the text
 }
+
+fun Task2(wordToBeFound: String, category: String) {
+    //Functions to simplify Trie methods calls
+    fun Trie<Char>.findIndex(string: String): Long {
+        return findIndex(string.toList())
+    }
+
+    fun Trie<Char>.listForms(prefix: String, wordIndex: Long): List<String> {
+        return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex)
+            .map { it.joinToString(separator = "") }
+    }
+
+    //Create a Trie object, where we store a dictionary of word forms
+    val dict = parseCSV()
+
+    //List the numbers of pages, where the word or it's forms where used
+    val answer1= findWordInText(dict.listForms(wordToBeFound,
+        dict.findIndex(wordToBeFound)).toList())
+    println("Страницы, на которых найдены формы слова \"$wordToBeFound\": ${answer1.first.joinToString()}")
+    //Forms of the word, that were used in the text
+    println("Формы, в которых встречается слово \"$wordToBeFound\": ${answer1.second.joinToString()}")
+    //Amount of times the word or it's forms were used
+    println("Количество раз, когда встретилось слово \"$wordToBeFound\": ${answer1.third}")
+    //Prints all lines, where the word or it's forms were used
+    findWordInText(dict.listForms(wordToBeFound, dict.findIndex(wordToBeFound)), task = 2)
+    //Print 5 most used words from the text
+    printMostUsedWords(dict)
+    println("Формы, в которых встречаются слова из категории \"$category\": " +
+            findWordsFromCategory(category, dict).joinToString()
+    )
+}
+
+fun Task3(wordToBeFound: String) {
+    //Functions to simplify Trie methods calls
+    fun Trie<Char>.findIndex(string: String): Long {
+        return findIndex(string.toList())
+    }
+
+    fun Trie<Char>.listForms(prefix: String, wordIndex: Long): List<String> {
+        return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex)
+            .map { it.joinToString(separator = "") }
+    }
+
+    //Create a Trie object, where we store a dictionary of word forms
+    val dict = parseCSV()
+    //Prints all lines, where the word or it's forms were used
+    findWordInText(dict.listForms(wordToBeFound, dict.findIndex(wordToBeFound)), task = 2)
+}
+
