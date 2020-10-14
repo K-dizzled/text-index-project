@@ -26,7 +26,7 @@ fun findWordInText(wordForms: List<String>, fileName: String, task: Int = 1)
                 // we find in the text, then we add it to our answer list
                 if (wordForms.contains(regx.replace(it, "").toLowerCase())) {
                     // If task number equals 2, we print the whole line
-                    if(task == 2)
+                    if(task == 3)
                         println(line)
                     else
                         pagesWhereWordFormAppears.add(pageIndex)
@@ -186,7 +186,6 @@ class Interface : CliktCommand() {
         val answer1= findWordInText(dict.listForms(wordToBeFound,
                 dict.findIndex(wordToBeFound)).toList(), fileName = inputFile)
         println("Страницы, на которых найдены формы слова \"$wordToBeFound\": ${answer1.first.joinToString()}")
-        // Forms of the word, that were used in the text
     }
 
     private fun task2(wordToBeFound: String, category: String, inputFile: String, topUsedWordsListSize: Int) {
@@ -215,6 +214,6 @@ class Interface : CliktCommand() {
         // Create a Trie object, where we store a dictionary of word forms
         val dict = parseCSV()
         // Prints all lines, where the word or it's forms were used
-        findWordInText(dict.listForms(wordToBeFound, dict.findIndex(wordToBeFound)), task = 2, fileName = inputFile)
+        findWordInText(dict.listForms(wordToBeFound, dict.findIndex(wordToBeFound)), task = 3, fileName = inputFile)
     }
 }

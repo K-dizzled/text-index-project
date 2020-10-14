@@ -1,6 +1,5 @@
 import org.junit.jupiter.api.*
-import ru.emkn.kotlin.main
-import ru.emkn.kotlin.main
+import ru.emkn.kotlin.*
 import java.lang.IllegalArgumentException
 import java.time.Duration
 import java.util.stream.IntStream
@@ -10,10 +9,11 @@ import kotlin.test.assertFailsWith
 
 class TextIndexTests {
     @Test
-    fun `simple test`() {
-//        assertEquals(2, main(2))
-//        assertEquals(3, main(3))
-//        assertEquals(5, main(4))
+    fun `Find word in text`() {
+//      assertEquals(2, main(2))
+        //val testWordForms = listOf("ìàìàøà", "ìàìàøó")
+
+
     }
 
 //    @Test
