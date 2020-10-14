@@ -1,10 +1,10 @@
 package ru.emkn.kotlin
 
-import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
-import java.io.File
+import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.core.CliktCommand
 import kotlin.collections.HashSet
+import java.io.File
 
 fun main(args: Array<String>) = Interface().main(args)
 
@@ -15,12 +15,17 @@ fun findWordInText(wordForms: List<String>, fileName: String, task: Int = 1)
     var formsCounter : Long = 0
     val pagesWhereWordFormAppears = hashSetOf<Int>()
     val wordFormsThatAppear = hashSetOf<String>()
+    // Regex used to remove punctuation marks etc.
     val regx = Regex("[^А-Яа-яA-Za-z0-9]")
     File(fileName).forEachLine { line ->
         if (line.trim() != "") {
             val wordList: List<String> = line.trim().split(" ")
             wordList.forEach {
+                // If the list of given word forms contains the word
+                // (with unwanted regex removed)
+                // we find in the text, then we add it to our answer list
                 if (wordForms.contains(regx.replace(it, "").toLowerCase())) {
+                    // If task number equals 2, we print the whole line
                     if(task == 2)
                         println(line)
                     else
@@ -50,6 +55,9 @@ fun makeListOfTopUsedWords(dict: Trie<Char>, fileName: String)
     File(fileName).forEachLine { line ->
         if (line.trim() != "") {
             val wordList: List<String> = line.trim().split(" ")
+            // Here we build a map of <Word Index, Amount of times it was found in text>.
+            // As we use indexes, not words, we roughly count each word "first form"
+            // occurrences in the text
             wordList.forEach {
                 val currentWordIndex = dict.findIndex(it)
                 if(!mostUsedWords.containsKey(currentWordIndex))
@@ -62,26 +70,38 @@ fun makeListOfTopUsedWords(dict: Trie<Char>, fileName: String)
     return mostUsedWords
 }
 
-fun printMostUsedWords(dict: Trie<Char>, fileName: String) {
+fun printMostUsedWords(dict: Trie<Char>, fileName: String, topNWords: Int) {
+    // Sort Map by word occurrences
     val answer2 = makeListOfTopUsedWords(dict, fileName).toList().sortedByDescending { it.second }
     var counter = 0
     var word = 0
     val topOfWords = mutableListOf<String>()
-    val listDic = parseIntoList()
-    while (counter < 5) {
+    // Parse odict to a list, so you can easily take any of its lines
+    val listDict = parseIntoList()
+    while (counter < topNWords) {
+        // If the word doesn't appear in odict, its index is set to -1
         if(answer2[word].first.toInt() != -1) {
-            var ffWord = listDic[answer2[word].first.toInt() - 1]
+            // Parse line of list
+            var ffWord = listDict[answer2[word].first.toInt() - 1]
                 .substringAfter("values=[")
+            // As sometimes in odict the second word indicates form of the word, we check
+            // its length to be more than 4
             val check = ffWord.substringAfter(", ").substringBefore(",")
             ffWord = ffWord.substringBefore(",")
+            // Also we want the word's length to be more than 4,
+            // to skip prepositions, particles etc.
             if((ffWord.length > 4) && (check.length > 4)) {
                 topOfWords.add(ffWord)
                 counter++
             }
         }
         word++
+        if (word >= answer2.size) {
+            println("Error: Указанное число желаемых слов превышает максимальное возможное")
+            return
+        }
     }
-    println("Топ 5 самых часто встречающихся в тексте слов: ${topOfWords.joinToString()}")
+    println("Топ $topNWords самых часто встречающихся в тексте слов: ${topOfWords.joinToString()}")
 }
 
 fun findWordsFromCategory(category: String, dict: Trie<Char>, fileName: String)
@@ -95,13 +115,20 @@ fun findWordsFromCategory(category: String, dict: Trie<Char>, fileName: String)
         return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex)
             .map { it.joinToString(separator = "") }
     }
+
     val wordsFromCategory = hashSetOf<String>()
     var neededList = listOf<String>()
+    // File with words listed by category
     File("./data/categories.txt").forEachLine { Category ->
            if(Category.startsWith(category)) {
                neededList = Category.substringAfter(": ").trim().split(" ")
         }
     }
+    // The algorithm below is the same as with looking
+    // for the word forms, the only difference is that
+    // we check not only does the word appear in the given
+    // list of wordForms, but also in all such wordLists
+    // of the words from one category
     val regx = Regex("[^А-Яа-яA-Za-z0-9]")
     val wordForms = mutableListOf<String>()
     for(word in neededList) {
@@ -123,13 +150,19 @@ class Interface : CliktCommand() {
     private val word: String by option(help="Word to look for").default("ужин")
     private val category: String by option(help="Category to look for").default("еда")
     private val input: String by option(help="Path for input text").default("./data/Childhood.txt")
+    private val top: Int by option(help="Define amount of most used words needed").int().default(5)
+
     override fun run() {
-        when(task) {
-            1 -> task1(word, input)
-            2 -> task2(word, category, input)
-            3 -> task3(word, input)
-            else -> println("Некорректный номер задания")
+        if (word.all { it.isLetter() } && File(input).exists()) {
+            when(task) {
+                1 -> task1(word, input)
+                2 -> task2(word, category, input, top)
+                3 -> task3(word, input)
+                else -> println("Некорректный номер задания")
+            }
         }
+        else
+            println("Error: Имя файла с входными данными или слово указаны неверно, проверьте входные данные")
     }
 
     //Functions to simplify Trie methods calls
@@ -153,23 +186,26 @@ class Interface : CliktCommand() {
         //Forms of the word, that were used in the text
     }
 
-    private fun task2(wordToBeFound: String, category: String, inputFile: String) {
-        //Create a Trie object, where we store a dictionary of word forms
+    private fun task2(wordToBeFound: String, category: String, inputFile: String, topUsedWordsListSize: Int) {
+        // Create a Trie object, where we store a dictionary of word forms
         val dict = parseCSV()
 
-        //List the numbers of pages, where the word or it's forms where used
+        // List the numbers of pages, where the word or it's forms where used
         val answer1= findWordInText(dict.listForms(wordToBeFound,
                 dict.findIndex(wordToBeFound)).toList(), fileName = inputFile)
         println("Страницы, на которых найдены формы слова \"$wordToBeFound\": ${answer1.first.joinToString()}")
-        //Forms of the word, that were used in the text
+        // Forms of the word, that were used in the text
         println("Формы, в которых встречается слово \"$wordToBeFound\": ${answer1.second.joinToString()}")
-        //Amount of times the word or it's forms were used
+        // Amount of times the word or it's forms were used
         println("Количество раз, когда встретилось слово \"$wordToBeFound\": ${answer1.third}")
-        //Print 5 most used words from the text
-        printMostUsedWords(dict, fileName = inputFile)
-        println("Формы, в которых встречаются слова из категории \"$category\": " +
-                findWordsFromCategory(category, dict, fileName = inputFile).joinToString()
-        )
+        // Print 5 most used words from the text
+        printMostUsedWords(dict, fileName = inputFile, topNWords = topUsedWordsListSize)
+        // Print words from given category
+        val wordsFromCategory = findWordsFromCategory(category, dict, fileName = inputFile).joinToString()
+        if(wordsFromCategory.isEmpty())
+            println("Error: Указанная категория не найдена, проверьте входные данные")
+        else
+            println("Формы, в которых встречаются слова из категории \"$category\": $wordsFromCategory")
     }
 
     private fun task3(wordToBeFound: String, inputFile: String) {
@@ -179,4 +215,3 @@ class Interface : CliktCommand() {
         findWordInText(dict.listForms(wordToBeFound, dict.findIndex(wordToBeFound)), task = 2, fileName = inputFile)
     }
 }
-

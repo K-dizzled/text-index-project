@@ -1,10 +1,8 @@
 package ru.emkn.kotlin
 
-import org.apache.commons.csv.CSVFormat
-import org.apache.commons.csv.CSVParser
+import org.apache.commons.csv.*
 import java.nio.charset.Charset
-import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.*
 
 fun parseCSV(): Trie<Char> {
 
@@ -15,10 +13,13 @@ fun parseCSV(): Trie<Char> {
     }
 
     val dictionary = Trie<Char>()
+    // Function gets the csv file, skips the first line, converts it
+    // from cp1251 encoding and uses every line to build a Trie
     Files.newBufferedReader(Paths.get(csvFilePath), Charset.forName("Windows-1251")).use { reader ->
         CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader()).use { csvParser ->
             for (csvRecord in csvParser) {
-                // Accessing Values by Column Index
+                // Inserting Values with it's row number
+                // to use it later as a word index
                 csvRecord.forEach {
                     dictionary.apply { insert(it, csvParser.recordNumber) }
                 }
@@ -29,6 +30,9 @@ fun parseCSV(): Trie<Char> {
     return dictionary
 }
 
+// A method that returns dictionary parsed into a list.
+// It is used to quickly access some line by its index
+// and find the first form of the word by index
 fun parseIntoList(): List<String> {
 
     val csvFilePath = "odict.csv"
