@@ -165,25 +165,28 @@ class Interface : CliktCommand() {
             println("Error: Имя файла с входными данными или слово указаны неверно, проверьте входные данные")
     }
 
-    //Functions to simplify Trie methods calls
+    // Functions to simplify Trie methods calls
     private fun Trie<Char>.findIndex(string: String): Long {
         return findIndex(string.toList())
     }
-
+    // Function searches for word forms of the word.
+    // It takes the first half of the word as prefix
+    // so that the word forms with length
+    // less than word's also count
     private fun Trie<Char>.listForms(prefix: String, wordIndex: Long): List<String> {
         return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex)
                 .map { it.joinToString(separator = "") }
     }
 
     private fun task1(wordToBeFound: String, inputFile: String) {
-        //Create a Trie object, where we store a dictionary of word forms
+        // Create a Trie object, where we store a dictionary of word forms
         val dict = parseCSV()
 
-        //List the numbers of pages, where the word or it's forms where used
+        // List the numbers of pages, where the word or it's forms where used
         val answer1= findWordInText(dict.listForms(wordToBeFound,
                 dict.findIndex(wordToBeFound)).toList(), fileName = inputFile)
         println("Страницы, на которых найдены формы слова \"$wordToBeFound\": ${answer1.first.joinToString()}")
-        //Forms of the word, that were used in the text
+        // Forms of the word, that were used in the text
     }
 
     private fun task2(wordToBeFound: String, category: String, inputFile: String, topUsedWordsListSize: Int) {
@@ -209,9 +212,9 @@ class Interface : CliktCommand() {
     }
 
     private fun task3(wordToBeFound: String, inputFile: String) {
-        //Create a Trie object, where we store a dictionary of word forms
+        // Create a Trie object, where we store a dictionary of word forms
         val dict = parseCSV()
-        //Prints all lines, where the word or it's forms were used
+        // Prints all lines, where the word or it's forms were used
         findWordInText(dict.listForms(wordToBeFound, dict.findIndex(wordToBeFound)), task = 2, fileName = inputFile)
     }
 }
