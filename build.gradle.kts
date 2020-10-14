@@ -62,9 +62,8 @@ tasks.shadowJar {
 
 val runJar by tasks.creating(Exec::class) {
     dependsOn(tasks.shadowJar)
-    val argvString = project.findProperty("argv") as String? ?: ""
     val jarFile = tasks.shadowJar.get().outputs.files.singleFile
-    val evalArgs = listOf("java", "-jar", jarFile.absolutePath) + argvString.split(" ")
+    val evalArgs = listOf("java", "-jar", jarFile.absolutePath)
     commandLine(*evalArgs.toTypedArray())
 }
 

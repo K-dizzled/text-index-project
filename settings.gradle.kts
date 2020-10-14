@@ -1,4 +1,4 @@
-rootProject.name = "kotlin-runnable-example"
+rootProject.name = "project-text-index"
 
 pluginManagement {
     val kotlinVersion: String by settings
