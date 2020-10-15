@@ -53,13 +53,35 @@ class TextIndexTests {
 //        assertEquals(20365011074L, res)
 //    }
 
-    @TestFactory
-    fun `multiple test`(): Stream<DynamicTest> {
-        val expected: List<Long> = listOf(1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89)
-        return IntStream.range(0, 11).mapToObj { n ->
-            DynamicTest.dynamicTest("Test fib for $n") {
-                //assertEquals(expected[n], main(n))
-            }
-        }
-    }
+//    @TestFactory
+//    fun `multiple test`(): Stream<DynamicTest> {
+//
+//        fun Trie<Char>.findIndexTest(string: String): Long {
+//            return findIndex(string.toList())
+//        }
+//
+//        fun Trie<Char>.listFormsTest(prefix: String, wordIndex: Long): List<String> {
+//            return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex)
+//                .map { it.joinToString(separator = "") }
+//        }
+//
+//        val dict = parseCSV()
+//        val words = listOf("парень", "модуль", "собака", "квадрат", "площадь",
+//            "круг", "вершина", "предел", "производная")
+//        val forms = mutableListOf<List<String>>()
+//        for (word in words) {
+//            forms.add(dict.listFormsTest(word, dict.findIndexTest(word)))
+//        }
+//        for (form in forms) {
+//            println(findWordInText(form,
+//                fileName = "./data/Mumintroll.txt").third)
+//        }
+//        val expected: List<Long> = listOf(1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89)
+//        return IntStream.range(0, 11).mapToObj { n ->
+//            DynamicTest.dynamicTest("Test fib for $n") {
+//                assertEquals(expected[n], findWordInText(forms[n],
+//                    fileName = "./data/Mumintroll.txt").third)
+//            }
+//        }
+//    }
 }
