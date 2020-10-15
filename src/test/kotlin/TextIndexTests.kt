@@ -1,18 +1,39 @@
-import org.junit.jupiter.api.*
-import ru.emkn.kotlin.*
-import java.lang.IllegalArgumentException
-import java.time.Duration
+import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
+import ru.emkn.kotlin.Trie
+import ru.emkn.kotlin.findWordInText
+import ru.emkn.kotlin.parseCSV
 import java.util.stream.IntStream
 import java.util.stream.Stream
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 class TextIndexTests {
     @Test
     fun `Find word in text`() {
-//      assertEquals(2, main(2))
-        //val testWordForms = listOf("������", "������")
+        assertEquals(hashSetOf(65, 66, 39, 8, 72, 10, 12, 19, 20, 24, 26, 58, 29, 30, 62),
+            findWordInText(listOf("отец", "отца", "отцом", "отцу"), fileName = "./data/Childhood.txt").first)
+        assertEquals(hashSetOf(10, 12),
+            findWordInText(listOf("хлебу", "хлеб", "хлебом", "хлеба"), fileName = "./data/Childhood.txt").first)
+        assertEquals(hashSetOf(),
+            findWordInText(listOf("утка", "уткой", "утки", "утке"), fileName = "./data/Childhood.txt").first)
 
+        assertEquals(hashSetOf("пространства", "пространство", "пространстве"),
+            findWordInText(listOf("пространства", "пространство", "пространством", "пространстве"),
+                fileName = "./data/textForTests.txt").second)
+        assertEquals(hashSetOf("куба"),
+            findWordInText(listOf("куб", "кубу", "кубом", "куба"), fileName = "./data/textForTests.txt").second)
+        assertEquals(hashSetOf(),
+            findWordInText(listOf("многогранник", "многогранником", "многогранники", "многограннике"),
+                fileName = "./data/textForTests.txt").second)
+
+        assertEquals(20,
+            findWordInText(listOf("троллей", "тролль", "троллю", "тролля", "тролли", "троллями"),
+                fileName = "./data/Mumintroll.txt").third)
+        assertEquals(20,
+            findWordInText(listOf("папы", "папе", "папу", "папа"), fileName = "./data/Mumintroll.txt").third)
+        assertEquals(0,
+            findWordInText(listOf("комета", "кометой", "кометы"), fileName = "./data/Mumintroll.txt").third)
 
     }
 
