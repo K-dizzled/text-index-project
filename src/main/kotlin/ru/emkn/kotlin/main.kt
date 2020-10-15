@@ -1,10 +1,14 @@
 package ru.emkn.kotlin
 
-import com.github.ajalt.clikt.parameters.types.int
-import com.github.ajalt.clikt.parameters.options.*
+//JSON
+//CliKt
 import com.github.ajalt.clikt.core.CliktCommand
-import kotlin.collections.HashSet
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.int
+//Files
 import java.io.File
+
 
 fun main(args: Array<String>) = Interface().main(args)
 
@@ -112,7 +116,7 @@ fun findWordsFromCategory(category: String, dict: Trie<Char>, fileName: String)
     }
 
     fun Trie<Char>.listForms(prefix: String, wordIndex: Long): List<String> {
-        return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex)
+        return listForms(prefix.substring(0, (prefix.length / 2)).toList(), wordIndex)
             .map { it.joinToString(separator = "") }
     }
 
@@ -145,12 +149,13 @@ fun findWordsFromCategory(category: String, dict: Trie<Char>, fileName: String)
     return wordsFromCategory
 }
 
+
 class Interface : CliktCommand() {
-    private val task: Int by option(help="Task number").int().default(1)
-    private val word: String by option(help="Word to look for").default("ужин")
-    private val category: String by option(help="Category to look for").default("еда")
-    private val input: String by option(help="Path for input text").default("./data/Childhood.txt")
-    private val top: Int by option(help="Define amount of most used words needed").int().default(5)
+    private val task: Int by option(help = "Task number").int().default(1)
+    private val word: String by option(help = "Word to look for").default("ужин")
+    private val category: String by option(help = "Category to look for").default("еда")
+    private val input: String by option(help = "Path for input text").default("./data/Childhood.txt")
+    private val top: Int by option(help = "Define amount of most used words needed").int().default(5)
 
     override fun run() {
         if (word.all { it.isLetter() } && File(input).exists()) {
@@ -174,7 +179,7 @@ class Interface : CliktCommand() {
     // so that the word forms with length
     // less than word's also count
     private fun Trie<Char>.listForms(prefix: String, wordIndex: Long): List<String> {
-        return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex)
+        return listForms(prefix.substring(0, (prefix.length / 2)).toList(), wordIndex)
                 .map { it.joinToString(separator = "") }
     }
 
@@ -183,8 +188,12 @@ class Interface : CliktCommand() {
         val dict = parseCSV()
 
         // List the numbers of pages, where the word or it's forms where used
-        val answer1= findWordInText(dict.listForms(wordToBeFound,
-                dict.findIndex(wordToBeFound)).toList(), fileName = inputFile)
+        val answer1= findWordInText(
+            dict.listForms(
+                wordToBeFound,
+                dict.findIndex(wordToBeFound)
+            ).toList(), fileName = inputFile
+        )
         println("Страницы, на которых найдены формы слова \"$wordToBeFound\": ${answer1.first.joinToString()}")
     }
 
@@ -193,8 +202,12 @@ class Interface : CliktCommand() {
         val dict = parseCSV()
 
         // List the numbers of pages, where the word or it's forms where used
-        val answer1= findWordInText(dict.listForms(wordToBeFound,
-                dict.findIndex(wordToBeFound)).toList(), fileName = inputFile)
+        val answer1= findWordInText(
+            dict.listForms(
+                wordToBeFound,
+                dict.findIndex(wordToBeFound)
+            ).toList(), fileName = inputFile
+        )
         println("Страницы, на которых найдены формы слова \"$wordToBeFound\": ${answer1.first.joinToString()}")
         // Forms of the word, that were used in the text
         println("Формы, в которых встречается слово \"$wordToBeFound\": ${answer1.second.joinToString()}")
