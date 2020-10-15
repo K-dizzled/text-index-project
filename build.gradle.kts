@@ -42,6 +42,7 @@ tasks.test {
     testLogging {
         events("passed", "skipped", "failed")
     }
+    maxHeapSize = "1024m"
 }
 
 tasks.register("hello") {

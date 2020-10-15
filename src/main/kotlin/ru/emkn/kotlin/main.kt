@@ -70,7 +70,7 @@ fun makeListOfTopUsedWords(dict: Trie<Char>, fileName: String)
     return mostUsedWords
 }
 
-fun printMostUsedWords(dict: Trie<Char>, fileName: String, topNWords: Int) {
+fun printMostUsedWords(dict: Trie<Char>, fileName: String, topNWords: Int) : MutableList<String> {
     // Sort Map by word occurrences
     val answer2 = makeListOfTopUsedWords(dict, fileName).toList().sortedByDescending { it.second }
     var counter = 0
@@ -98,10 +98,10 @@ fun printMostUsedWords(dict: Trie<Char>, fileName: String, topNWords: Int) {
         word++
         if (word >= answer2.size) {
             println("Error: Указанное число желаемых слов превышает максимальное возможное")
-            return
+            return topOfWords
         }
     }
-    println("Топ $topNWords самых часто встречающихся в тексте слов: ${topOfWords.joinToString()}")
+    return topOfWords
 }
 
 fun findWordsFromCategory(category: String, dict: Trie<Char>, fileName: String)
@@ -201,7 +201,8 @@ class Interface : CliktCommand() {
         // Amount of times the word or it's forms were used
         println("Количество раз, когда встретилось слово \"$wordToBeFound\": ${answer1.third}")
         // Print 5 most used words from the text
-        printMostUsedWords(dict, fileName = inputFile, topNWords = topUsedWordsListSize)
+        val topNWords = printMostUsedWords(dict, fileName = inputFile, topNWords = topUsedWordsListSize)
+        println("Топ $topUsedWordsListSize самых часто встречающихся в тексте слов: ${topNWords.joinToString()}")
         // Print words from given category
         val wordsFromCategory = findWordsFromCategory(category, dict, fileName = inputFile).joinToString()
         if(wordsFromCategory.isEmpty())
