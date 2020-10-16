@@ -1,13 +1,21 @@
 package ru.emkn.kotlin
 
-//JSON
 //CliKt
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
+//JSON
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
+import com.jayway.jsonpath.Configuration
+import com.jayway.jsonpath.JsonPath
 //Files
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 
 
 fun main(args: Array<String>) = Interface().main(args)
@@ -158,16 +166,25 @@ class Interface : CliktCommand() {
     private val top: Int by option(help = "Define amount of most used words needed").int().default(5)
 
     override fun run() {
-        if (word.all { it.isLetter() } && File(input).exists()) {
+        val path = "data/${input.substringAfterLast("/").substringBefore(".")}TextIndex.json"
+        if (File(input).exists()) {
+            if (!File(path).exists())
+                analyzeText(path)
+        }
+        else
+            println("Error: Имя файла с входными данными или слово указаны неверно, проверьте входные данные")
+        val json = String(Files.readAllBytes(Paths.get(path)))
+        val document: Any = Configuration.defaultConfiguration().jsonProvider().parse(json)
+        if (word.all { it.isLetter() }) {
             when(task) {
-                1 -> task1(word, input)
+                1 -> task1(word, document)
                 2 -> task2(word, category, input, top)
-                3 -> task3(word, input)
+                3 -> task3(word, document, input)
                 else -> println("Некорректный номер задания")
             }
         }
         else
-            println("Error: Имя файла с входными данными или слово указаны неверно, проверьте входные данные")
+            println("Error: Слово указано неверно, проверьте входные данные")
     }
 
     // Functions to simplify Trie methods calls
@@ -183,18 +200,15 @@ class Interface : CliktCommand() {
                 .map { it.joinToString(separator = "") }
     }
 
-    private fun task1(wordToBeFound: String, inputFile: String) {
-        // Create a Trie object, where we store a dictionary of word forms
-        val dict = parseCSV()
-
-        // List the numbers of pages, where the word or it's forms where used
-        val answer1= findWordInText(
-            dict.listForms(
-                wordToBeFound,
-                dict.findIndex(wordToBeFound)
-            ).toList(), fileName = inputFile
+    private fun task1(wordToBeFound: String, document: Any) {
+        val pages
+                = JsonPath.read<List<Map<String, Any>>>(
+            document,
+            "$[?('$wordToBeFound'in @.forms)]['pageIndex']"
         )
-        println("Страницы, на которых найдены формы слова \"$wordToBeFound\": ${answer1.first.joinToString()}")
+        val answer = pages.toString().substringAfterLast("[")
+            .substringBefore("]").split(",").joinToString()
+        println("Страницы, на которых найдены формы слова \"$wordToBeFound\": $answer")
     }
 
     private fun task2(wordToBeFound: String, category: String, inputFile: String, topUsedWordsListSize: Int) {
@@ -224,10 +238,62 @@ class Interface : CliktCommand() {
             println("Формы, в которых встречаются слова из категории \"$category\": $wordsFromCategory")
     }
 
-    private fun task3(wordToBeFound: String, inputFile: String) {
-        // Create a Trie object, where we store a dictionary of word forms
-        val dict = parseCSV()
-        // Prints all lines, where the word or it's forms were used
-        findWordInText(dict.listForms(wordToBeFound, dict.findIndex(wordToBeFound)), task = 3, fileName = inputFile)
+    private fun task3(wordToBeFound: String, document: Any, path: String) {
+        val pages
+                = JsonPath.read<List<Map<String, Any>>>(
+            document,
+            "$[?('$wordToBeFound'in @.forms)]['lineIndex']"
+        )
+        val answers = pages.toString().substringAfterLast("[")
+            .substringBefore("]").split(",")
+        val lines = File(path).readLines()
+        for (answer in answers )
+            println("   ${lines[answer.toInt()]}")
     }
+}
+
+fun analyzeText(file: String) {
+    fun Trie<Char>.findIndex(string: String): Long {
+        return findIndex(string.toList())
+    }
+
+    //Parse dictionary
+    val dict = parseCSV()
+    //Create a Set of Words where we will store all primary data
+    val wordIndex : HashMap<Long, Word> = LinkedHashMap()
+
+    var pageIndex = 1
+    var lineIndex = 1
+    var countLine = 1
+    val regx = Regex("[^А-Яа-яA-Za-z0-9]")
+    var index : Long
+    File(file).forEachLine { line ->
+        if (line.trim() != "") {
+            val wordList: List<String> = line.trim().split(" ")
+            wordList.forEach {
+                index = dict.findIndex((regx.replace(it, "").toLowerCase()))
+                if(index.toInt() != -1) {
+                    if (!wordIndex.containsKey(index)){
+                        wordIndex[index] = Word(index)
+                    }
+                    wordIndex[index]?.addForm(regx.replace(it, "").toLowerCase())
+                    wordIndex[index]?.addPage(pageIndex)
+                    wordIndex[index]?.addLine(countLine)
+                    wordIndex[index]?.increaseAmount()
+                }
+            }
+            lineIndex++
+            if(lineIndex == 45) {
+                lineIndex = 1
+                pageIndex++
+            }
+        }
+        countLine++
+    }
+    val jsonString = Gson().toJson(wordIndex.values)
+    val gson = GsonBuilder().setPrettyPrinting().create()
+    val je: JsonElement = JsonParser().parse(jsonString)
+    val prettyJsonString = gson.toJson(je)
+    val path = "data/${file.substringAfter("/").substringBefore(".")}TextIndex.json"
+    File(path).writeText(prettyJsonString)
 }

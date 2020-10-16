@@ -30,7 +30,7 @@ dependencies {
     implementation("org.apache.commons:commons-csv:1.5")
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3")
     //JSON Parser
-    implementation ("com.jayway.jsonpath", "json-path", "2.0.0")
+    implementation ("com.jayway.jsonpath", "json-path", "2.4.0")
     implementation ("com.google.code.gson:gson:2.8.5")
 }
 
