@@ -1,94 +1,61 @@
+import com.jayway.jsonpath.Configuration
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
-import ru.emkn.kotlin.Trie
-import ru.emkn.kotlin.findWordInText
-import ru.emkn.kotlin.parseCSV
-import ru.emkn.kotlin.printMostUsedWords
+import ru.emkn.kotlin.*
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.stream.IntStream
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 
 class TextIndexTests {
-    private fun Trie<Char>.findIndexTest(string: String): Long {
-        return findIndex(string.toList())
-    }
-
-    private fun Trie<Char>.listFormsTest(prefix: String, wordIndex: Long): List<String> {
-        return listForms(prefix.substring(0,(prefix.length / 2)).toList(), wordIndex)
-            .map { it.joinToString(separator = "") }
-    }
-
-    private val dict = parseCSV()
-
     @Test
     fun `find word in text`() {
-        assertEquals(hashSetOf(65, 66, 39, 8, 72, 10, 12, 19, 20, 24, 26, 58, 29, 30, 62),
-            findWordInText(listOf("отец", "отца", "отцом", "отцу"), fileName = "./data/Childhood.txt").first)
-        assertEquals(hashSetOf(10, 12),
-            findWordInText(listOf("хлебу", "хлеб", "хлебом", "хлеба"), fileName = "./data/Childhood.txt").first)
-        assertEquals(hashSetOf(),
-            findWordInText(listOf("утка", "уткой", "утки", "утке"), fileName = "./data/Childhood.txt").first)
+        val path = "data/ChildhoodTextIndex.json"
+        val json = String(Files.readAllBytes(Paths.get(path)))
+        val document: Any = Configuration.defaultConfiguration().jsonProvider().parse(json)
+        assertEquals(listOf("8", "10", "12", "19", "20", "24", "26", "29", "30", "39", "58", "62", "65", "66", "72"),
+            task1("отец", document))
+        assertEquals(listOf("1", "36", "51"),
+                task1("лев", document))
+        assertEquals(listOf(""),
+                task1("утка", document))
 
-        assertEquals(hashSetOf("пространства", "пространство", "пространстве"),
-            findWordInText(listOf("пространства", "пространство", "пространством", "пространстве"),
-                fileName = "./data/textForTests.txt").second)
-        assertEquals(hashSetOf("куба"),
-            findWordInText(listOf("куб", "кубу", "кубом", "куба"), fileName = "./data/textForTests.txt").second)
-        assertEquals(hashSetOf(),
-            findWordInText(listOf("многогранник", "многогранником", "многогранники", "многограннике"),
-                fileName = "./data/textForTests.txt").second)
+        val path1 = "data/textForTestsTextIndex.json"
+        val json1 = String(Files.readAllBytes(Paths.get(path1)))
+        val document1: Any = Configuration.defaultConfiguration().jsonProvider().parse(json1)
+        assertEquals(listOf(""),
+                task1("модуль", document1))
+        assertEquals(listOf(""),
+                task1("дробь", document1))
+        assertEquals(listOf("1", "2", "8"),
+                task1("производной", document1))
 
-        assertEquals(20,
-            findWordInText(listOf("троллей", "тролль", "троллю", "тролля", "тролли", "троллями"),
-                fileName = "./data/Mumintroll.txt").third)
-        assertEquals(20,
-            findWordInText(listOf("папы", "папе", "папу", "папа"), fileName = "./data/Mumintroll.txt").third)
-        assertEquals(0,
-            findWordInText(listOf("комета", "кометой", "кометы"), fileName = "./data/Mumintroll.txt").third)
+        val path2 = "data/MumintrollTextIndex.json"
+        val json2 = String(Files.readAllBytes(Paths.get(path2)))
+        val document2: Any = Configuration.defaultConfiguration().jsonProvider().parse(json2)
+        assertEquals(listOf("2", "3", "4", "5"),
+                task1("тролль", document2))
+        assertEquals(listOf(""),
+                task1("шапка", document2))
+        assertEquals(listOf("1", "3", "4", "6"),
+                task1("лодка", document2))
 
     }
-
-//    @Test
-//    fun `illegal argument test`() {
-//        assertFailsWith(IllegalArgumentException::class) {
-//            //main(-2)
-//        }
-//    }
-
-    @TestFactory
-    fun `top of words multiple test`() : Stream<DynamicTest> {
-        val texts = listOf("./data/Childhood.txt", "./data/Mumintroll.txt", "./data/textForTests.txt")
-        val expected = mutableListOf<MutableList<String>>()
-        expected.add(mutableListOf("чтобы", "только", "ничего",
-            "будто", "перед", "первый", "должно", "около", "через", "подле"))
-        expected.add(mutableListOf("чтобы", "ничего", "дальше",
-            "вокруг", "словно", "через", "всего", "только", "среди", "можно"))
-        expected.add(mutableListOf("чтобы", "более", "первый",
-            "можно", "сотый", "через", "менее", "должно", "фиксировать", "ничего"))
-
-        return IntStream.range(0, 3).mapToObj { n ->
-            DynamicTest.dynamicTest("Test top for $n text") {
-                assertEquals(expected[n], printMostUsedWords(dict, texts[n], 10))
-            }
-        }
-    }
-
 
     @TestFactory
     fun `words count multiple test`(): Stream<DynamicTest> {
+        val path = "data/ChildhoodTextIndex.json"
+        val json = String(Files.readAllBytes(Paths.get(path)))
+        val document: Any = Configuration.defaultConfiguration().jsonProvider().parse(json)
         val words = listOf("парень", "модуль", "собака", "квадрат", "площадь",
-            "круг", "вершина", "предел", "производная")
-        val forms = mutableListOf<List<String>>()
-        for (word in words) {
-            forms.add(dict.listFormsTest(word, dict.findIndexTest(word)))
-        }
+            "пошел", "вершина", "готов", "ужин")
 
-        val expected: List<Long> = listOf(0, 0, 0, 2, 1, 5, 3, 1, 6)
+        val expected: List<Long> = listOf(1, 0, 20, 0, 0, 0, 0, 12, 5)
         return IntStream.range(0, 9).mapToObj { n ->
             DynamicTest.dynamicTest("Test word count for $n word") {
-                assertEquals(expected[n], findWordInText(forms[n],
-                    fileName = "./data/textForTests.txt").third)
+                assertEquals(expected[n], task2(words[n], "еда", document, 1))
             }
         }
     }
