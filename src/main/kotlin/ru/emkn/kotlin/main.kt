@@ -172,6 +172,8 @@ fun analyzeText(file: String) {
                     if (!wordIndex.containsKey(index)){
                         wordIndex[index] = Word(index)
                     }
+                    if(it == "хлеб")
+                        wordIndex[index]?.category = "еда"
                     wordIndex[index]?.addForm(regx.replace(it, "").toLowerCase())
                     wordIndex[index]?.addPage(pageIndex)
                     wordIndex[index]?.addLine(countLine)
