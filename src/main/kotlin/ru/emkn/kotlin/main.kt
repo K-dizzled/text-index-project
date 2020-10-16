@@ -55,9 +55,11 @@ class Interface : CliktCommand() {
     private val top: Int by option(help = "Define amount of most used words needed").int().default(5)
 
     override fun run() {
+        // Here we check, if the given file exists
         val path = "data/${input.substringAfterLast("/").substringBefore(".")}TextIndex.json"
-        println(path)
         if (File(input).exists()) {
+            // If input path is correct, we check if we already have a built
+            // index for that file, and if not - build it
             if (!File(path).exists())
                 analyzeText(input)
             val json = String(Files.readAllBytes(Paths.get(path)))
@@ -74,7 +76,7 @@ class Interface : CliktCommand() {
                 println("Error: Слово указано неверно, проверьте входные данные")
         }
         else {
-            println("Error: Имя файла с входными данными или слово указаны неверно, проверьте входные данные")
+            println("Error: Имя файла для анализа указано неверно, проверьте входные данные")
         }
     }
 
@@ -161,8 +163,11 @@ fun analyzeText(file: String) {
     File(file).forEachLine { line ->
         if (line.trim() != "") {
             val wordList: List<String> = line.trim().split(" ")
+            // Check every word
             wordList.forEach {
+                // Get word's index
                 index = dict.findIndex((regx.replace(it, "").toLowerCase()))
+                // Create new Word Object or make changes in existing one
                 if(index.toInt() != -1) {
                     if (!wordIndex.containsKey(index)){
                         wordIndex[index] = Word(index)
@@ -173,6 +178,7 @@ fun analyzeText(file: String) {
                     wordIndex[index]?.increaseAmount()
                 }
             }
+            // Count lines for params
             lineIndex++
             if(lineIndex == 45) {
                 lineIndex = 1
@@ -182,9 +188,11 @@ fun analyzeText(file: String) {
         countLine++
     }
     val jsonString = Gson().toJson(wordIndex.values)
+    // Make JSON look pretty
     val gson = GsonBuilder().setPrettyPrinting().create()
     val je: JsonElement = JsonParser().parse(jsonString)
     val prettyJsonString = gson.toJson(je)
+    // Write our Object with all words and information about them to a JSON file
     val path = "data/${file.substringAfter("/").substringBefore(".")}TextIndex.json"
     File(path).writeText(prettyJsonString)
 }
