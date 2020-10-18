@@ -14,6 +14,8 @@ class TextIndexTests {
     @Test
     fun `find word in text`() {
         val path = "data/ChildhoodTextIndex.json"
+        if (!File(path).exists())
+            analyzeText("data/Childhood.txt")
         val json = String(Files.readAllBytes(Paths.get(path)))
         val document: Any = Configuration.defaultConfiguration().jsonProvider().parse(json)
         assertEquals(listOf("8", "10", "12", "19", "20", "24", "26", "29", "30", "39", "58", "62", "65", "66", "72"),
