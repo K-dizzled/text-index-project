@@ -51,7 +51,7 @@ class Interface : CliktCommand() {
     private val task: Int by option(help = "Task number").int().default(1)
     private val word: String by option(help = "Word to look for").default("ужин")
     private val category: String by option(help = "Category to look for").default("еда")
-    private val input: String by option(help = "Path for input text").default("./data/Childhood.txt")
+    private val input: String by option(help = "Path for input text").default("data/Childhood.txt")
     private val top: Int by option(help = "Define amount of most used words needed").int().default(5)
 
     override fun run() {

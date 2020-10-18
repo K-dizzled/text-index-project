@@ -3,6 +3,7 @@ import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import ru.emkn.kotlin.*
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.stream.IntStream
@@ -23,6 +24,8 @@ class TextIndexTests {
                 task1("утка", document))
 
         val path1 = "data/textForTestsTextIndex.json"
+        if (!File(path1).exists())
+            analyzeText("data/textForTests.txt")
         val json1 = String(Files.readAllBytes(Paths.get(path1)))
         val document1: Any = Configuration.defaultConfiguration().jsonProvider().parse(json1)
         assertEquals(listOf(""),
@@ -33,6 +36,8 @@ class TextIndexTests {
                 task1("производной", document1))
 
         val path2 = "data/MumintrollTextIndex.json"
+        if (!File(path2).exists())
+            analyzeText("data/Mumintroll.txt")
         val json2 = String(Files.readAllBytes(Paths.get(path2)))
         val document2: Any = Configuration.defaultConfiguration().jsonProvider().parse(json2)
         assertEquals(listOf("2", "3", "4", "5"),
