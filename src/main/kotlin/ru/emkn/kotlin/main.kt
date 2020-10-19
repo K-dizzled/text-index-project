@@ -1,22 +1,18 @@
 package ru.emkn.kotlin
 
 //CliKt
+//JSON
+//Files
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
-//JSON
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonElement
-import com.google.gson.JsonParser
+import com.google.gson.*
 import com.jayway.jsonpath.Configuration
 import com.jayway.jsonpath.JsonPath
-//Files
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
-
 
 fun main(args: Array<String>) = Interface().main(args)
 
@@ -28,22 +24,27 @@ fun printMostUsedWords(top: List<Map<String, Any>>, topUsedWordsListSize: Int) {
     var number = 0
     var ind = 0
     while (number < topUsedWordsListSize) {
-        // As sometimes in odict the second word indicates form of the word, we check
-        // its length to be more than 4
-        if(topList[ind]["forms"].toString().substringBefore("\",\"")
-                        .substringBefore("\"]").length > 6) {
-            if (number == topUsedWordsListSize - 1) {
-                print(topList[ind]["forms"].toString()
-                        .substringAfter("[\"").substringBefore("\""))
-                println()
+        if (ind < topList.size) {
+            // As sometimes in odict the second word indicates form of the word, we check
+            // its length to be more than 4
+            if (topList[ind]["forms"].toString().substringBefore("\",\"")
+                            .substringBefore("\"]").length > 6) {
+                if (number == topUsedWordsListSize - 1) {
+                    print(topList[ind]["forms"].toString()
+                            .substringAfter("[\"").substringBefore("\""))
+                    println()
+                } else {
+                    print("${
+                        topList[ind]["forms"].toString()
+                                .substringAfter("[\"").substringBefore("\"")
+                    }, ")
+                }
+                number++
             }
-            else{
-                print("${topList[ind]["forms"].toString()
-                        .substringAfter("[\"").substringBefore("\"")}, ")
-            }
-            number++
+            ind++
         }
-        ind++
+        else
+            return
     }
 }
 
@@ -153,7 +154,7 @@ fun analyzeText(file: String) {
     //Parse dictionary
     val dict = parseCSV()
     //Create a Set of Words where we will store all primary data
-    val wordIndex : HashMap<Long, Word> = LinkedHashMap()
+    var wordIndex : HashMap<Long, Word> = LinkedHashMap()
 
     var pageIndex = 1
     var lineIndex = 1
@@ -172,8 +173,6 @@ fun analyzeText(file: String) {
                     if (!wordIndex.containsKey(index)){
                         wordIndex[index] = Word(index)
                     }
-                    if(it == "хлеб")
-                        wordIndex[index]?.category = "еда"
                     wordIndex[index]?.addForm(regx.replace(it, "").toLowerCase())
                     wordIndex[index]?.addPage(pageIndex)
                     wordIndex[index]?.addLine(countLine)
@@ -189,6 +188,8 @@ fun analyzeText(file: String) {
         }
         countLine++
     }
+
+    wordIndex = categorize(wordIndex, dict)
     val jsonString = Gson().toJson(wordIndex.values)
     // Make JSON look pretty
     val gson = GsonBuilder().setPrettyPrinting().create()
@@ -197,4 +198,24 @@ fun analyzeText(file: String) {
     // Write our Object with all words and information about them to a JSON file
     val path = "data/${file.substringAfter("/").substringBefore(".")}TextIndex.json"
     File(path).writeText(prettyJsonString)
+}
+
+fun categorize(wordIndex: HashMap<Long, Word>, dict: Trie<Char>) : HashMap<Long, Word> {
+    fun Trie<Char>.findIndex(string: String): Long {
+        return findIndex(string.toList())
+    }
+    var name: String
+    var words: List<String>
+    // Read categories from file
+    val path = "data/categories.txt"
+    // For each word mentioned for every category we add
+    // this category name to word properties
+    File(path).forEachLine { category ->
+        name = category.substringBefore(":")
+        words = category.substringAfter(": ").trim().split(" ")
+        words.forEach{
+            wordIndex[dict.findIndex(it)]?.category = name
+        }
+    }
+    return wordIndex
 }

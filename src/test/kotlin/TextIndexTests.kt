@@ -12,43 +12,64 @@ import kotlin.test.assertEquals
 
 class TextIndexTests {
     @Test
-    fun `find word in text`() {
+    fun `find word in text1`() {
         val path = "data/ChildhoodTextIndex.json"
         if (!File(path).exists())
             analyzeText("data/Childhood.txt")
         val json = String(Files.readAllBytes(Paths.get(path)))
         val document: Any = Configuration.defaultConfiguration().jsonProvider().parse(json)
-        assertEquals(listOf("8", "10", "12", "19", "20", "24", "26", "29", "30", "39", "58", "62", "65", "66", "72"),
-            task1("отец", document))
-        assertEquals(listOf("1", "36", "51"),
-                task1("лев", document))
-        assertEquals(listOf(""),
-                task1("утка", document))
-
+        assertEquals(
+            listOf("8", "10", "12", "19", "20", "24", "26", "29", "30", "39", "58", "62", "65", "66", "72"),
+            task1("отец", document)
+        )
+        assertEquals(
+            listOf("1", "36", "51"),
+            task1("лев", document)
+        )
+        assertEquals(
+            listOf(""),
+            task1("утка", document)
+        )
+    }
+    @Test
+    fun `find word in text2`() {
         val path1 = "data/textForTestsTextIndex.json"
         if (!File(path1).exists())
             analyzeText("data/textForTests.txt")
         val json1 = String(Files.readAllBytes(Paths.get(path1)))
         val document1: Any = Configuration.defaultConfiguration().jsonProvider().parse(json1)
-        assertEquals(listOf(""),
-                task1("модуль", document1))
-        assertEquals(listOf(""),
-                task1("дробь", document1))
-        assertEquals(listOf("1", "2", "8"),
-                task1("производной", document1))
-
+        assertEquals(
+            listOf(""),
+            task1("модуль", document1)
+        )
+        assertEquals(
+            listOf(""),
+            task1("дробь", document1)
+        )
+        assertEquals(
+            listOf("1", "2", "8"),
+            task1("производной", document1)
+        )
+    }
+    @Test
+    fun `find word in text3`() {
         val path2 = "data/MumintrollTextIndex.json"
         if (!File(path2).exists())
             analyzeText("data/Mumintroll.txt")
         val json2 = String(Files.readAllBytes(Paths.get(path2)))
         val document2: Any = Configuration.defaultConfiguration().jsonProvider().parse(json2)
-        assertEquals(listOf("2", "3", "4", "5"),
-                task1("тролль", document2))
-        assertEquals(listOf(""),
-                task1("шапка", document2))
-        assertEquals(listOf("1", "3", "4", "6"),
-                task1("лодка", document2))
-
+        assertEquals(
+            listOf("2", "3", "4", "5"),
+            task1("тролль", document2)
+        )
+        assertEquals(
+            listOf(""),
+            task1("шапка", document2)
+        )
+        assertEquals(
+            listOf("1", "3", "4", "6"),
+            task1("лодка", document2)
+        )
     }
 
     @TestFactory

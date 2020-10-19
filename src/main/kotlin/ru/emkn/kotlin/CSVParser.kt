@@ -29,22 +29,3 @@ fun parseCSV(): Trie<Char> {
 
     return dictionary
 }
-
-// A method that returns dictionary parsed into a list.
-// It is used to quickly access some line by its index
-// and find the first form of the word by index
-fun parseIntoList(): List<String> {
-
-    val csvFilePath = "odict.csv"
-
-    val listDict = mutableListOf<String>()
-    Files.newBufferedReader(Paths.get(csvFilePath), Charset.forName("Windows-1251")).use { reader ->
-        CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader()).use { csvParser ->
-            for (csvRecord in csvParser) {
-                listDict.add(csvRecord.toString())
-            }
-        }
-    }
-
-    return listDict
-}
