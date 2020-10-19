@@ -87,4 +87,19 @@ class TextIndexTests {
             }
         }
     }
+    @TestFactory
+    fun `words count multiple test2`(): Stream<DynamicTest> {
+        val path = "data/MumintrollTextIndex.json"
+        val json = String(Files.readAllBytes(Paths.get(path)))
+        val document: Any = Configuration.defaultConfiguration().jsonProvider().parse(json)
+        val words = listOf("тролль", "лодка", "парус", "камень", "шалаш",
+            "беседка", "цветы", "обсерватория", "мама")
+
+        val expected: List<Long> = listOf(20, 22, 3, 0, 0, 0, 0, 0, 100)
+        return IntStream.range(0, 9).mapToObj { n ->
+            DynamicTest.dynamicTest("Test word count for $n word") {
+                assertEquals(expected[n], task2(words[n], "еда", document, 1))
+            }
+        }
+    }
 }
