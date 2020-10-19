@@ -87,7 +87,7 @@ fun task1(wordToBeFound: String, document: Any) : List<String> {
     val pages
             = JsonPath.read<List<Map<String, Any>>>(
             document,
-            "$[?('$wordToBeFound'in @.forms)]['pageIndex']"
+            "$[?('$wordToBeFound'in @.wordForms)]['pageIndex']"
     )
     val answer = pages.toString().substringAfterLast("[")
             .substringBefore("]").split(",")
@@ -99,7 +99,7 @@ fun task2(wordToBeFound: String, category: String, document: Any, topUsedWordsLi
     val info
             = JsonPath.read<List<Map<String, Any>>>(
             document,
-            "$[?('$wordToBeFound'in @.forms)]"
+            "$[?('$wordToBeFound'in @.wordForms)]"
     )
     val fromCategory = JsonPath.read<List<Map<String, Any>>>(
             document,
@@ -134,7 +134,7 @@ fun task3(wordToBeFound: String, document: Any, path: String) {
     val linesJ
             = JsonPath.read<List<Map<String, Any>>>(
             document,
-            "$[?('$wordToBeFound'in @.forms)]['lineIndex']"
+            "$[?('$wordToBeFound'in @.wordForms)]['lineIndex']"
     )
     val answers = linesJ.toString().substringAfterLast("[")
             .substringBefore("]").split(",")
@@ -149,6 +149,11 @@ fun task3(wordToBeFound: String, document: Any, path: String) {
 fun analyzeText(file: String) {
     fun Trie<Char>.findIndex(string: String): Long {
         return findIndex(string.toList())
+    }
+
+    fun Trie<Char>.listForms(prefix: String, wordIndex: Long): List<String> {
+        return listForms(prefix.substring(0, (prefix.length / 2)).toList(), wordIndex)
+                .map { it.joinToString(separator = "") }
     }
 
     //Parse dictionary
@@ -171,7 +176,7 @@ fun analyzeText(file: String) {
                 // Create new Word Object or make changes in existing one
                 if(index.toInt() != -1) {
                     if (!wordIndex.containsKey(index)){
-                        wordIndex[index] = Word(index)
+                        wordIndex[index] = Word(index, dict.listForms(regx.replace(it, "").toLowerCase(), index))
                     }
                     wordIndex[index]?.addForm(regx.replace(it, "").toLowerCase())
                     wordIndex[index]?.addPage(pageIndex)

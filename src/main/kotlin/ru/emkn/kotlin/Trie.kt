@@ -27,6 +27,33 @@ class Trie<Key> {
         }
         return if (current.isTerminating) current.wordIndex else -1
     }
+
+    // Methods that return all forms of the word
+    private fun listForms(prefix: List<Key>, node: TrieNode<Key>?, wordIndex: Long): List<List<Key>> {
+        val results = mutableListOf<List<Key>>()
+
+        if (node?.isTerminating == true) {
+            if (node.wordIndex == wordIndex)
+                results.add(prefix)
+        }
+
+        node?.children?.forEach { (key, node) ->
+            results.addAll(listForms(prefix + key, node, wordIndex))
+        }
+
+        return results
+    }
+
+    fun listForms(prefix: List<Key>, wordIndex: Long): List<List<Key>> {
+        var current = root
+
+        prefix.forEach { element ->
+            val child = current.children[element] ?: return emptyList()
+            current = child
+        }
+
+        return listForms(prefix, current, wordIndex)
+    }
 }
 
 // Node structure

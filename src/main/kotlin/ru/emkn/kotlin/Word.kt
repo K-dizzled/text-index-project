@@ -2,10 +2,11 @@ package ru.emkn.kotlin
 
 import com.google.gson.annotations.SerializedName
 
-class Word(index: Long) {
+class Word(index: Long, wordF: List<String>) {
     @SerializedName("category") var category = ""
     @SerializedName("id") val id = index
     @SerializedName("forms") var usedForms = mutableListOf<String>()
+    @SerializedName("wordForms") var wordForms = wordF
     @SerializedName("pageIndex") var pageIndex = mutableListOf<Int>()
     @SerializedName("lineIndex") var lineIndex = mutableListOf<Int>()
     @SerializedName("amount") var amount = 0
