@@ -1,6 +1,6 @@
 language:
   java
 after_success:
-  grade test
+  gradle test
 os:
   linux
